@@ -15,6 +15,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.knowcontributionsap2.data.local.entities.ContributionsEntity
@@ -25,10 +27,12 @@ import kotlinx.coroutines.GlobalScope
 import com.example.knowcontributionsap2.MainActivity
 
 
+
 @Composable
 fun ContributionList(
     contributions: List<ContributionsEntity>,
-    onContributionClick: (ContributionsEntity) -> Unit
+    onContributionClick: (ContributionsEntity) -> Unit,
+    onContributionDelete: (ContributionsEntity) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -46,18 +50,23 @@ fun ContributionList(
                         .clickable { onContributionClick(contributions) }
                         .padding(4.dp)
                 ) {
-                    Text(text = contributions.contributionId.toString() + ".", modifier = Modifier.weight(0.10f))
-                    Text(text = contributions.nombre, modifier = Modifier.weight(0.20f))
-                    Text(text = contributions.monto.toString(), modifier = Modifier.weight(0.25f))
+                    Text(text = contributions.contributionId.toString() + ".", modifier = Modifier.weight(0.100f))
+                    Text(text = contributions.nombre, modifier = Modifier.weight(0.25f))
+                    Text(text = "£ " + contributions.monto.toString(), modifier = Modifier.weight(0.25f))
                     Text(text = contributions.descripcion, modifier = Modifier.weight(0.25f))
-                    IconButton(
-                        onClick = {
-                        },
+
+                    IconButton(onClick = {
+                        onContributionDelete(contributions)
+                    },
                         modifier = Modifier.height(23.dp),
 
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                        ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Eliminar"
+                        )
                     }
+
                 }
             }
         }

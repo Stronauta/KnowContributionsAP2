@@ -1,7 +1,5 @@
 package com.example.knowcontributionsap2
 
-import android.app.AlertDialog
-import android.icu.util.Calendar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,19 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.knowcontributionsap2.ui.theme.KnowContributionsAP2Theme
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import android.app.DatePickerDialog
-import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +29,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.room.Room
-import java.util.*
+
 
 import com.example.knowcontributionsap2.data.local.entities.ContributionsEntity
 import com.example.knowcontributionsap2.data.local.database.ContributionDb
@@ -49,12 +41,12 @@ import kotlinx.coroutines.flow.Flow
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.ImeAction
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 
 import java.util.Date
 
 
+@Suppress("NAME_SHADOWING")
 class MainActivity : ComponentActivity() {
     private lateinit var contributionDb: ContributionDb
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,7 +80,7 @@ class MainActivity : ComponentActivity() {
                         )
                         var contributionsIds by remember { mutableStateOf("") }
                         var nombre by remember { mutableStateOf("") }
-                        var monto by remember { mutableStateOf(0.0) }
+                        var monto by remember { mutableDoubleStateOf(0.0) }
                         var descripcion by remember { mutableStateOf("") }
 
                         ElevatedCard(
@@ -178,22 +170,29 @@ class MainActivity : ComponentActivity() {
                         }
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        ContributionList(
-                            contributions = contribution,
-                            onContributionClick = { contribution ->
-                                contributionsIds = contribution.contributionId.toString()
-                                nombre = contribution.nombre
-                                monto = contribution.monto
-                                descripcion = contribution.descripcion
+                        if (contribution.isNotEmpty()) {
+                            ContributionList(
+                                contributions = contribution,
+                                onContributionClick = { contribution ->
+                                    contributionsIds = contribution.contributionId.toString()
+                                    nombre = contribution.nombre
+                                    monto = contribution.monto
+                                    descripcion = contribution.descripcion
 
-                            }
-                        )
+                                }
+                                ,
+                                onContributionDelete = { contribution ->
+                                    deleteContribution(contribution)
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun saveContribution(contribution: ContributionsEntity) {
         GlobalScope.launch {
             contributionDb.contributionDao().save(contribution)
@@ -204,13 +203,16 @@ class MainActivity : ComponentActivity() {
         return contributionDb.contributionDao().getAll()
     }
 
-    public fun deleteContribution(contribution: ContributionsEntity) {
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun deleteContribution(contribution: ContributionsEntity) {
         GlobalScope.launch {
             contributionDb.contributionDao().delete(contribution)
         }
     }
 
 }
+
+
 
 
 /*
