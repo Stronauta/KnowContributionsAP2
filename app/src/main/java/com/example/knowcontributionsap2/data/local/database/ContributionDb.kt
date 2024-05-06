@@ -5,7 +5,6 @@ import androidx.room.RoomDatabase
 import com.example.knowcontributionsap2.data.local.entities.ContributionsEntity
 import com.example.knowcontributionsap2.data.local.dao.ContributionDao
 
-
 @Database(
     entities = [
         ContributionsEntity::class
