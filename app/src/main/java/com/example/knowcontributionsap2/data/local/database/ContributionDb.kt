@@ -9,7 +9,7 @@ import com.example.knowcontributionsap2.data.local.dao.ContributionDao
     entities = [
         ContributionsEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
