@@ -1,5 +1,6 @@
 package com.example.knowcontributionsap2.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,14 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.knowcontributionsap2.data.local.entities.ContributionsEntity
 import com.example.knowcontributionsap2.data.local.database.ContributionDb
@@ -34,6 +35,7 @@ fun ContributionList(
     onContributionClick: (ContributionsEntity) -> Unit,
     onContributionDelete: (ContributionsEntity) -> Unit
 ){
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,13 +59,16 @@ fun ContributionList(
 
                     IconButton(onClick = {
                         onContributionDelete(contributions)
+                        Toast.makeText(context, "Contribución eliminada", Toast.LENGTH_SHORT).show()
                     },
                         modifier = Modifier.height(23.dp),
 
+
                         ) {
                         Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Eliminar"
+                            Icons.TwoTone.Delete,
+                            contentDescription = "Eliminar",
+                            tint = Color(0xFFC95050)
                         )
                     }
 
@@ -72,3 +77,5 @@ fun ContributionList(
         }
     }
 }
+
+

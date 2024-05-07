@@ -1,6 +1,7 @@
 package com.example.knowcontributionsap2
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,13 +46,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.coroutines.DelicateCoroutinesApi
-
 import java.util.Date
 
+import androidx.compose.runtime.remember
+import java.text.SimpleDateFormat
+import java.util.*
 
-@Suppress("NAME_SHADOWING")
 class MainActivity : ComponentActivity() {
     private lateinit var contributionDb: ContributionDb
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +91,17 @@ class MainActivity : ComponentActivity() {
                         var monto by remember { mutableDoubleStateOf(0.0) }
                         var descripcion by remember { mutableStateOf("") }
 
+                        val context = LocalContext.current
+
+                        fun validateInput(): Boolean {
+                            return nombre.isNotEmpty() && monto > 0.0 && descripcion.isNotEmpty()
+                        }
+
+                        fun getCurrentDate(): String {
+                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            return sdf.format(Date())
+                        }
+
                         ElevatedCard(
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -90,27 +109,57 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(8.dp)
                             ) {
 
+                                val currentDate = remember { mutableStateOf(getCurrentDate()) }
+
+                                OutlinedTextField(
+                                    value = currentDate.value,
+                                    onValueChange = {},
+                                    label = { Text("Fecha") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.DateRange,
+                                            contentDescription = "person"
+                                        )
+                                    },
+                                    readOnly = true
+                                )
+
                                 OutlinedTextField(
                                     maxLines = 1,
                                     label = { Text("Nombre") },
                                     value = nombre,
                                     onValueChange = { nombre = it },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Person,
+                                            contentDescription = "person"
+                                        )
+                                    }
                                 )
+
                                 Spacer(modifier = Modifier.height(4.dp))
 
                                 OutlinedTextField(
                                     maxLines = 1,
-                                    label = { Text(text = "Monto") },
+                                    label = { Text("Monto") },
                                     value = monto.toString(),
-                                    onValueChange = { n ->
-                                        if (n.length <= 6) {
-                                            monto = n.toDoubleOrNull() ?: 0.0
-                                        }
+                                    onValueChange = { newValue ->
+                                        val newText = newValue.takeIf { it.matches(Regex("""^\d{0,5}(\.\d{0,2})?$""")) } ?: monto.toString()
+                                        monto = newText.toDoubleOrNull() ?: 0.0
+                                    },
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.MoreVert,
+                                            contentDescription = "person"
+                                        )
+
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                                 )
+
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -118,7 +167,13 @@ class MainActivity : ComponentActivity() {
                                     label = { Text("Descripción") },
                                     value = descripcion,
                                     onValueChange = { descripcion = it},
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = "person"
+                                        )
+                                    }
                                 )
 
                                 Spacer(modifier = Modifier.height(15.dp))
@@ -129,9 +184,13 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     OutlinedButton(
                                         onClick = {
-                                            nombre = ""
-                                            monto = 0.0
-                                            descripcion = ""
+                                            if (nombre.isNotEmpty() || monto > 0.0 || descripcion.isNotEmpty()) {
+                                                nombre = ""
+                                                monto = 0.0
+                                                descripcion = ""
+
+                                                Toast.makeText(context, "Datos limpiados", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                     ) {
                                         Icon(
@@ -143,24 +202,30 @@ class MainActivity : ComponentActivity() {
 
                                     OutlinedButton(
                                         onClick = {
-                                            saveContribution(
-                                                ContributionsEntity(
-                                                    contributionId = contributionsIds.toIntOrNull(),
-                                                    nombre = nombre,
-                                                    monto = monto,
-                                                    descripcion = descripcion,
-                                                    fecha = Date().toString()
+                                            if (validateInput()) {
+                                                saveContribution(
+                                                    ContributionsEntity(
+                                                        contributionId = contributionsIds.toIntOrNull(),
+                                                        nombre = nombre,
+                                                        monto = monto,
+                                                        descripcion = descripcion,
+                                                        fecha = Date().toString()
+                                                    )
                                                 )
-                                            )
-                                            contributionsIds = ""
-                                            nombre = ""
-                                            monto = 0.0
-                                            descripcion = ""
+                                                contributionsIds = ""
+                                                nombre = ""
+                                                monto = 0.0
+                                                descripcion = ""
 
+                                                Toast.makeText(context, "Datos guardados", Toast.LENGTH_SHORT).show()
+                                            } else {
+
+                                                Toast.makeText(context, "Ingrese los datos correctamente", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.Add,
+                                            imageVector = Icons.Default.Done,
                                             contentDescription = "save button"
                                         )
                                         Text(text = "Guardar")
@@ -188,6 +253,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+
             }
         }
     }
@@ -210,8 +276,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-}
 
+
+
+}
 
 
 
