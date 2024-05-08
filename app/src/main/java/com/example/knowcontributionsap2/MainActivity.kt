@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
@@ -53,7 +52,8 @@ import java.util.Date
 
 import androidx.compose.runtime.remember
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var contributionDb: ContributionDb
@@ -91,16 +91,16 @@ class MainActivity : ComponentActivity() {
                         var monto by remember { mutableDoubleStateOf(0.0) }
                         var descripcion by remember { mutableStateOf("") }
 
+                        val dateFormat = SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss ", Locale.getDefault())
+                        val fechaFormateada = dateFormat.format(Date())
+
+
                         val context = LocalContext.current
 
                         fun validateInput(): Boolean {
                             return nombre.isNotEmpty() && monto > 0.0 && descripcion.isNotEmpty()
                         }
 
-                        fun getCurrentDate(): String {
-                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            return sdf.format(Date())
-                        }
 
                         ElevatedCard(
                             modifier = Modifier.fillMaxWidth()
@@ -109,28 +109,12 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(8.dp)
                             ) {
 
-                                var currentDate = remember { mutableStateOf(getCurrentDate()) }
-
-                                OutlinedTextField(
-                                    value = currentDate.value,
-                                    onValueChange = {},
-                                    label = { Text("Fecha") },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    trailingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Default.DateRange,
-                                            contentDescription = "Date"
-                                        )
-                                    },
-                                    readOnly = true
-                                )
-
                                 OutlinedTextField(
                                     maxLines = 1,
                                     label = { Text("Nombre") },
                                     value = nombre,
-                                    onValueChange = { newValue ->
-                                        val filtrarName = newValue.take(30).filter { it.isLetter() || it.isWhitespace() }
+                                    onValueChange = { name ->
+                                        val filtrarName = name.take(30).filter { it.isLetter() || it.isWhitespace() }
                                         nombre = filtrarName
                                     },
                                     modifier = Modifier.fillMaxWidth(),
@@ -212,7 +196,7 @@ class MainActivity : ComponentActivity() {
                                                         nombre = nombre,
                                                         monto = monto,
                                                         descripcion = descripcion,
-                                                        fecha = Date().toString()
+                                                        fecha = fechaFormateada
                                                     )
                                                 )
                                                 contributionsIds = ""
@@ -284,7 +268,6 @@ class MainActivity : ComponentActivity() {
 
 
 }
-
 
 
 

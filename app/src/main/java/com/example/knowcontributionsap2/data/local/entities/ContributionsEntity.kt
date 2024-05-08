@@ -2,7 +2,6 @@ package com.example.knowcontributionsap2.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "Contributions")
 data class ContributionsEntity(
