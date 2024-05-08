@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp") //Todo: 1. Investigar ksp
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -31,7 +31,7 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17 //Todo: 2. Investigar versiones Java
+        sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
@@ -41,7 +41,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8" //Todo: 3. Investigar versiones kotlin complier
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {

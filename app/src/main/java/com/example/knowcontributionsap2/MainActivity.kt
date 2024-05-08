@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(8.dp)
                             ) {
 
-                                val currentDate = remember { mutableStateOf(getCurrentDate()) }
+                                var currentDate = remember { mutableStateOf(getCurrentDate()) }
 
                                 OutlinedTextField(
                                     value = currentDate.value,
@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
                                     trailingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.DateRange,
-                                            contentDescription = "person"
+                                            contentDescription = "Date"
                                         )
                                     },
                                     readOnly = true
@@ -129,7 +129,10 @@ class MainActivity : ComponentActivity() {
                                     maxLines = 1,
                                     label = { Text("Nombre") },
                                     value = nombre,
-                                    onValueChange = { nombre = it },
+                                    onValueChange = { newValue ->
+                                        val filtrarName = newValue.take(30).filter { it.isLetter() || it.isWhitespace() }
+                                        nombre = filtrarName
+                                    },
                                     modifier = Modifier.fillMaxWidth(),
                                     trailingIcon = {
                                         Icon(
@@ -152,7 +155,7 @@ class MainActivity : ComponentActivity() {
                                     trailingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.MoreVert,
-                                            contentDescription = "person"
+                                            contentDescription = "Money"
                                         )
 
                                     },
@@ -233,6 +236,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         if (contribution.isNotEmpty()) {
@@ -253,10 +257,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-
             }
         }
     }
+
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun saveContribution(contribution: ContributionsEntity) {
@@ -283,84 +287,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-/*
 
-@Composable
-fun InputMonto(){
-    var  monto by remember { mutableStateOf("") }
-
-    OutlinedTextField(
-        maxLines = 1,
-        label = { Text("Monto") },
-        value = monto,
-        onValueChange = { n ->
-            if (n.length <= 6) {
-                monto = n
-            }
-        },
-        modifier = Modifier.padding(16.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-    )
-}
-
-@Composable
-fun InputDescription(){
-    var descripcion by remember { mutableStateOf("") }
-
-    OutlinedTextField(
-        label = { Text("Descripción") },
-        value = descripcion,
-        onValueChange = { descripcion = it},
-        modifier = Modifier.padding(16.dp)
-    )
-
-}
-
-
-@Composable
-fun InputFecha(
-    selectedDate: Calendar,
-    onDateSelected: (Calendar) -> Unit
-) {
-    var fechaSeleccionada by remember { mutableStateOf(selectedDate) }
-    val context = LocalContext.current
-    val datePickerDialog = remember {
-        DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                val calendar = Calendar.getInstance()
-                calendar.set(year, month, day)
-                fechaSeleccionada = calendar
-                onDateSelected(calendar)
-            },
-            selectedDate.get(Calendar.YEAR),
-            selectedDate.get(Calendar.MONTH),
-            selectedDate.get(Calendar.DAY_OF_MONTH)
-        )
-    }
-
-    Button(
-        onClick = {
-            datePickerDialog.show()
-        },
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Text(text = "Seleccionar Fecha")
-    }
-
-    Text(
-        text = "Fecha seleccionada: ${fechaSeleccionada.formattedDate()}",
-        modifier = Modifier.padding(16.dp)
-    )
-}
-
-@Composable
-private fun Calendar.formattedDate(): String {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return sdf.format(time)
-}
-
-*/
 
 
 
